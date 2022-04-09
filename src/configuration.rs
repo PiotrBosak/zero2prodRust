@@ -21,6 +21,12 @@ impl DatabaseSettings {
             self.username.0, self.password.0, self.host.0, self.port.0, self.database_name.0
         )
     }
+    pub fn connection_string_without_db(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}",
+            self.username.0, self.password.0, self.host.0, self.port.0
+        )
+    }
 }
 #[derive(serde::Deserialize)]
 pub struct DatabaseUsername(String);
@@ -31,7 +37,7 @@ pub struct DatabasePort(u16);
 #[derive(serde::Deserialize)]
 pub struct Host(String);
 #[derive(serde::Deserialize)]
-pub struct DatabaseName(String);
+pub struct DatabaseName(pub String);
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let mut settings = config::Config::default();
