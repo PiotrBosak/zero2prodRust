@@ -1,4 +1,4 @@
-use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{HttpResponse, Responder};
 
 pub async fn health_check() -> impl Responder {
     HttpResponse::Ok()

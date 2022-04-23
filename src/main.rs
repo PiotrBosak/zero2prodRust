@@ -1,8 +1,6 @@
-use std::{io::stdout, net::TcpListener};
+use std::net::TcpListener;
 
-use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{PgConnection, PgPool};
 use zerotoprod::configuration::get_configuration;
 use zerotoprod::run;
 use zerotoprod::telemetry::{get_subscriber, init_subscriber};
@@ -11,7 +9,6 @@ use zerotoprod::telemetry::{get_subscriber, init_subscriber};
 async fn main() -> std::io::Result<()> {
     let subsriber = get_subscriber("zerotoprod".into(), "info".into());
     init_subscriber(subsriber);
-
 
     let configuration = get_configuration().expect("Failed to read configuration");
     let connection_pool = PgPoolOptions::new()

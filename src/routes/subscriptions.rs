@@ -1,9 +1,7 @@
-use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{web, HttpResponse};
 use chrono::Utc;
-use log;
 use sqlx::PgPool;
 use tracing::Instrument;
-use tracing::Span;
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
