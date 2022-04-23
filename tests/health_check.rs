@@ -1,11 +1,9 @@
 use std::net::TcpListener;
 
 use once_cell::sync::Lazy;
-use sqlx::postgres::PgConnectOptions;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
-use zerotoprod::configuration::{get_configuration, DatabaseName, DatabaseSettings, Settings};
-use zerotoprod::run;
+use zerotoprod::configuration::{get_configuration, DatabaseName, DatabaseSettings};
 use zerotoprod::telemetry::{get_subscriber, init_subscriber};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
