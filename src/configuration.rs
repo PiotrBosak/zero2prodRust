@@ -3,13 +3,13 @@ use config;
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application: ApplicationSetting
+    pub application: ApplicationSetting,
 }
 
 #[derive(serde::Deserialize)]
 pub struct ApplicationSetting {
     pub port: Port,
-    pub host: ApplicationHost
+    pub host: ApplicationHost,
 }
 #[derive(serde::Deserialize)]
 pub struct ApplicationHost(pub String);
@@ -61,21 +61,21 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         .try_into()
         .expect("Failed to parse APP_ENVIRONEMENT");
     settings.merge(
-        config::File::from(configuration_directory.join(environment.as_str())).required(true)
+        config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
 
     settings.try_into()
 }
 pub enum Environment {
     Local,
-    Production
+    Production,
 }
 
 impl Environment {
     pub fn as_str(&self) -> &'static str {
         match self {
             Environment::Local => "local",
-            Environment::Production => "production"
+            Environment::Production => "production",
         }
     }
 }
@@ -84,13 +84,13 @@ impl TryFrom<String> for Environment {
     type Error = String;
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
-     match s.to_lowercase().as_str() {
-         "local" => Ok(Self::Local),
-         "production" => Ok(Self::Production),
-         other => Err(format!(
-             "{} is not a supported environment. Use either 'local' or 'production'",
-             other
-         )),
-     }
-   }
+        match s.to_lowercase().as_str() {
+            "local" => Ok(Self::Local),
+            "production" => Ok(Self::Production),
+            other => Err(format!(
+                "{} is not a supported environment. Use either 'local' or 'production'",
+                other
+            )),
+        }
+    }
 }

@@ -1,12 +1,12 @@
 use std::net::TcpListener;
 
-use sqlx::postgres::PgConnectOptions;
-use sqlx::{Connection, PgPool, Executor, PgConnection};
-use uuid::Uuid;
-use zerotoprod::telemetry::{init_subscriber, get_subscriber};
-use zerotoprod::configuration::{get_configuration, DatabaseName, Settings, DatabaseSettings};
-use zerotoprod::run;
 use once_cell::sync::Lazy;
+use sqlx::postgres::PgConnectOptions;
+use sqlx::{Connection, Executor, PgConnection, PgPool};
+use uuid::Uuid;
+use zerotoprod::configuration::{get_configuration, DatabaseName, DatabaseSettings, Settings};
+use zerotoprod::run;
+use zerotoprod::telemetry::{get_subscriber, init_subscriber};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let subscriber = get_subscriber("test".into(), "debug".into());
@@ -101,7 +101,8 @@ async fn spawn_app() -> TestApp {
     let mut configuration = get_configuration().expect("Failed to read configuration");
     configuration.database.database_name = DatabaseName(Uuid::new_v4().to_string());
     let connection_pool = configure_database(&configuration.database).await;
-    let server = zerotoprod::run(listener, connection_pool.clone()).expect("Failed to bind address");
+    let server =
+        zerotoprod::run(listener, connection_pool.clone()).expect("Failed to bind address");
     let _ = tokio::spawn(server);
     let address = format!("http://localhost:{}", port);
 
@@ -129,5 +130,4 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to run the database");
 
     connection_pool
-
 }
