@@ -1,5 +1,6 @@
 use config;
-
+use serde_aux::field_attributes::deserialize_number_from_string;
+use std::str::FromStr;
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
@@ -8,6 +9,7 @@ pub struct Settings {
 
 #[derive(serde::Deserialize)]
 pub struct ApplicationSetting {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: Port,
     pub host: ApplicationHost,
 }
@@ -16,10 +18,19 @@ pub struct ApplicationHost(pub String);
 
 #[derive(serde::Deserialize)]
 pub struct Port(pub u16);
+impl FromStr for Port {
+    type Err = <u16 as ::core::str::FromStr>::Err;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let n = u16::from_str(s)?;
+        Ok(Port(n))
+    }
+}
+
 #[derive(serde::Deserialize)]
 pub struct DatabaseSettings {
     pub username: DatabaseUsername,
     pub password: DatabasePassword,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: DatabasePort,
     pub host: ApplicationHost,
     pub database_name: DatabaseName,
@@ -44,6 +55,13 @@ pub struct DatabaseUsername(String);
 pub struct DatabasePassword(String);
 #[derive(serde::Deserialize)]
 pub struct DatabasePort(u16);
+impl FromStr for DatabasePort {
+    type Err = <u16 as ::core::str::FromStr>::Err;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let n = u16::from_str(s)?;
+        Ok(DatabasePort(n))
+    }
+}
 #[derive(serde::Deserialize)]
 pub struct Host(String);
 #[derive(serde::Deserialize)]
@@ -56,13 +74,15 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
     settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
 
-    let environment: Environment = std::env::var("APP_ENVIRONEMENT")
+    let environment: Environment = std::env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "local".into())
         .try_into()
-        .expect("Failed to parse APP_ENVIRONEMENT");
+        .expect("Failed to parse APP_ENVIRONMENT");
     settings.merge(
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
+
+    settings.merge(config::Environment::with_prefix("app").separator("__"))?;
 
     settings.try_into()
 }
