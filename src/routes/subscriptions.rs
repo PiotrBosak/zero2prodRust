@@ -1,5 +1,4 @@
-use actix_web::{web, HttpResponse};
-use chrono::Utc;
+use actix_web::{HttpResponse, web};
 use sqlx::PgPool;
 use tracing::Instrument;
 use uuid::Uuid;
@@ -39,7 +38,7 @@ pub async fn subscribe(form: web::Form<FormatData>, pool: web::Data<PgPool>) -> 
         Uuid::new_v4(),
         form.email.0,
         form.name.0,
-        Utc::now()
+        chrono::Utc::now()
     )
     .execute(pool.as_ref())
     .instrument(query_span)
